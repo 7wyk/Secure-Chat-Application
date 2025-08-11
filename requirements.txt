@@ -1,0 +1,29 @@
+# Secure Chat Application Dependencies
+# Core dependencies for the secure chat application
+
+# Database connectivity
+psycopg2-binary==2.9.7
+# PostgreSQL adapter for Python
+
+# Cryptography
+cryptography==41.0.4
+# Modern cryptographic library for Python
+
+# Environment management
+python-dotenv==1.0.0
+# Load environment variables from .env file
+
+# Development dependencies (optional)
+# Uncomment for development/testing
+
+# pytest==7.4.2
+# Testing framework
+
+# black==23.7.0
+# Code formatter
+
+# flake8==6.0.0
+# Code linting
+
+# mypy==1.5.1
+# Type checking
