@@ -1,7 +1,3 @@
-"""
-Database operations for secure chat application.
-Handles PostgreSQL operations with security best practices.
-"""
 
 import psycopg2
 from psycopg2 import sql, extras
@@ -22,10 +18,10 @@ class DatabaseManager:
         try:
             self.connection = psycopg2.connect(
                 Config.DATABASE_URL,
-                sslmode='require',  # Force SSL connection
+                sslmode='require',
                 cursor_factory=extras.RealDictCursor
             )
-            self.connection.autocommit = False  # Use transactions
+            self.connection.autocommit = False  
             print("✓ Database connection established")
             self.create_tables()
             return True
@@ -37,7 +33,7 @@ class DatabaseManager:
         """Create necessary tables if they don't exist."""
         try:
             with self.connection.cursor() as cursor:
-                # Users table
+               
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS users (
                         id SERIAL PRIMARY KEY,
@@ -51,7 +47,7 @@ class DatabaseManager:
                     )
                 """)
                 
-                # Messages table
+                
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS messages (
                         id SERIAL PRIMARY KEY,
@@ -66,7 +62,7 @@ class DatabaseManager:
                     )
                 """)
                 
-                # Chat rooms table
+               
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS chat_rooms (
                         id SERIAL PRIMARY KEY,
@@ -77,7 +73,7 @@ class DatabaseManager:
                     )
                 """)
                 
-                # Room membership table
+                
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS room_members (
                         id SERIAL PRIMARY KEY,
@@ -89,7 +85,7 @@ class DatabaseManager:
                     )
                 """)
                 
-                # Session tokens table (for authentication)
+               
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS user_sessions (
                         id SERIAL PRIMARY KEY,
@@ -100,7 +96,7 @@ class DatabaseManager:
                     )
                 """)
                 
-                # Create indexes for performance
+                
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id)")
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_messages_recipient ON messages(recipient_id)")
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_messages_timestamp ON messages(timestamp)")
@@ -115,12 +111,12 @@ class DatabaseManager:
     
     def hash_password(self, password):
         """Create secure password hash with salt."""
-        salt = secrets.token_hex(32)  # 64-character hex string
+        salt = secrets.token_hex(32)  
         password_hash = hashlib.pbkdf2_hmac(
             'sha256',
             password.encode('utf-8'),
             salt.encode('utf-8'),
-            100000  # iterations
+            100000  
         )
         return password_hash.hex(), salt
     
@@ -137,7 +133,7 @@ class DatabaseManager:
     def create_user(self, username, password, public_key=None):
         """Create a new user account."""
         try:
-            # Input validation
+            
             if not username or not password:
                 return None, "Username and password are required"
             
@@ -147,13 +143,13 @@ class DatabaseManager:
             if len(password) < 6:
                 return None, "Password must be at least 6 characters"
             
-            # Check if username already exists
+           
             with self.connection.cursor() as cursor:
                 cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
                 if cursor.fetchone():
                     return None, "Username already exists"
                 
-                # Hash password and create user
+               
                 password_hash, salt = self.hash_password(password)
                 
                 cursor.execute("""
@@ -187,7 +183,7 @@ class DatabaseManager:
                     return None, "Invalid username or password"
                 
                 if self.verify_password(password, user['password_hash'], user['salt']):
-                    # Update online status
+                    
                     cursor.execute("""
                         UPDATE users SET is_online = TRUE, last_seen = CURRENT_TIMESTAMP
                         WHERE id = %s
