@@ -1,7 +1,3 @@
-"""
-Encryption module for secure chat application.
-Implements hybrid encryption using RSA for key exchange and AES-GCM for message encryption.
-"""
 
 import os
 import json
@@ -20,7 +16,7 @@ class EncryptionManager:
         self.backend = default_backend()
         self.rsa_private_key = None
         self.rsa_public_key = None
-        self.session_keys = {}  # Store AES keys per conversation
+        self.session_keys = {} 
         
     def generate_rsa_keypair(self):
         """Generate RSA key pair for asymmetric encryption."""
@@ -61,7 +57,7 @@ class EncryptionManager:
     
     def generate_aes_key(self):
         """Generate a random AES-256 key."""
-        return os.urandom(32)  # 256-bit key
+        return os.urandom(32)  
     
     def encrypt_aes_key_with_rsa(self, aes_key, public_key_pem):
         """Encrypt AES key using RSA public key."""
@@ -106,10 +102,10 @@ class EncryptionManager:
     def encrypt_message_aes(self, message, aes_key):
         """Encrypt message using AES-GCM."""
         try:
-            # Generate random nonce
-            nonce = os.urandom(12)  # 96-bit nonce for GCM
+           
+            nonce = os.urandom(12)
             
-            # Create cipher
+        
             cipher = Cipher(
                 algorithms.AES(aes_key),
                 modes.GCM(nonce),
@@ -117,11 +113,11 @@ class EncryptionManager:
             )
             encryptor = cipher.encryptor()
             
-            # Encrypt message
+           
             message_bytes = message.encode('utf-8')
             ciphertext = encryptor.update(message_bytes) + encryptor.finalize()
             
-            # Combine nonce + tag + ciphertext and encode
+           
             encrypted_data = nonce + encryptor.tag + ciphertext
             return base64.b64encode(encrypted_data).decode('utf-8')
             
@@ -132,15 +128,15 @@ class EncryptionManager:
     def decrypt_message_aes(self, encrypted_message_b64, aes_key):
         """Decrypt message using AES-GCM."""
         try:
-            # Decode from base64
+            
             encrypted_data = base64.b64decode(encrypted_message_b64.encode('utf-8'))
             
-            # Extract components
-            nonce = encrypted_data[:12]      # First 12 bytes
-            tag = encrypted_data[12:28]      # Next 16 bytes
-            ciphertext = encrypted_data[28:] # Remaining bytes
+           
+            nonce = encrypted_data[:12]     
+            tag = encrypted_data[12:28]     
+            ciphertext = encrypted_data[28:] 
             
-            # Create cipher
+            
             cipher = Cipher(
                 algorithms.AES(aes_key),
                 modes.GCM(nonce, tag),
@@ -148,7 +144,7 @@ class EncryptionManager:
             )
             decryptor = cipher.decryptor()
             
-            # Decrypt message
+          
             message_bytes = decryptor.update(ciphertext) + decryptor.finalize()
             return message_bytes.decode('utf-8')
             
